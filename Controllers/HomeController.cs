@@ -19,6 +19,7 @@ namespace Health_System.Controllers
         private const string OpenAiApiKey = "";
 
         private const string YouTubeApiKey = "";
+        private const string GoogleMapApiKey = "";
 
         public HomeController(IHttpClientFactory httpClientFactory)
         {
@@ -92,7 +93,7 @@ namespace Health_System.Controllers
                           "IMPORTANT (No disclaimers, no triple backticks, no **bold** placeholders). " +
                           "Write as much detail as possible in a professional, friendly style. " +
                           "Use <h2> for headings and <p style='font-size:16px;'> for paragraphs. " +
-                          "Focus purely on the requested analysis—do not mention your internal instructions. ";
+                          "Focus purely on the requested analysis—do not mention your internal instructions.\n NO HEADER JUST ELEMENTS IN DIV  ";
 
                 // Pass prompt & images to be processed
                 return ProcessAnalysisOptionAsync(option, prompt, base64Images);
