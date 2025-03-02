@@ -16,7 +16,7 @@ namespace Health_System.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
 
         // TODO: Move these keys to config or environment variables in production!
-        private const string OpenAiApiKey = "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";
+        private const string OpenAiApiKey = "";
 
         private const string YouTubeApiKey = "";
 
