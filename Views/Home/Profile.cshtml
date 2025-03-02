@@ -1,0 +1,461 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BioCheck AI - DashBoard</title>
+
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <!-- Google Fonts: Montserrat & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <script src="~/js/mainFunctions.js"></script>
+    <link rel="stylesheet" href="~/css/custom.css">
+   
+    <style>
+        .nav-btn {
+            background: transparent;
+            border: none;
+            margin: 0 10px;
+            font-size: 16px;
+            color: var(--gray-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+            .nav-btn:hover {
+                color: var(--brand-teal);
+            }
+
+            .nav-btn i {
+                margin-right: 8px;
+                font-size: 20px;
+            }
+        /* Main Content */
+        .content-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--brand-teal), var(--brand-green));
+            color: #fff;
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .welcome-banner h1 {
+                font-size: 2.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .welcome-banner p {
+                font-size: 1.2rem;
+                margin-bottom: 1.5rem;
+            }
+
+        .health-score {
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: #ffeb3b;
+        }
+        /* Quick Stats Cards */
+        .quick-stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            flex: 1;
+            margin: 0.5rem;
+            min-width: 200px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .stat-card i {
+                font-size: 2rem;
+                color: var(--brand-teal);
+                margin-bottom: 0.5rem;
+            }
+
+            .stat-card h3 {
+                margin: 0.5rem 0;
+                font-size: 1.2rem;
+                color: #000;
+            }
+
+            .stat-card p {
+                margin: 0;
+                font-size: 1rem;
+                color: #777;
+            }
+        /* Quick Actions */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            color: var(--gray-dark);
+        }
+
+            .action-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+            }
+
+            .action-card i {
+                font-size: 2.2rem;
+                color: var(--brand-green);
+                margin-bottom: 1rem;
+            }
+
+            .action-card h3 {
+                font-size: 1.2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .action-card p {
+                font-size: 0.95rem;
+                color: #555;
+            }
+
+        .report-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .report-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            transition: transform 0.3s;
+        }
+
+            .report-card:hover {
+                transform: translateY(-5px);
+            }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+            .report-header h3 {
+                font-size: 1.1rem;
+                margin: 0;
+                color: var(--brand-teal);
+            }
+
+        .report-date {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .report-summary p {
+            font-size: 0.95rem;
+            margin: 0 0 1rem;
+            color: #555;
+        }
+
+        .report-status {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+        }
+
+            .report-status.positive {
+                color: #2e7d32;
+                background: #e8f5e9;
+            }
+
+            .report-status.neutral {
+                color: #f9a825;
+                background: #fffde7;
+            }
+        /* Health Tips Carousel */
+        .tips-carousel {
+            display: flex;
+            overflow-x: auto;
+            gap: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        .tip-card {
+            flex: 0 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            text-align: center;
+            min-width: 250px;
+            transition: transform 0.3s;
+        }
+
+            .tip-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .tip-card i {
+                font-size: 2rem;
+                color: var(--brand-teal);
+                margin-bottom: 0.5rem;
+            }
+
+            .tip-card h3 {
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .tip-card p {
+                font-size: 0.9rem;
+                color: #555;
+            }
+        /* Footer */
+        .main-footer {
+            background: var(--gray-dark);
+            color: #fff;
+            text-align: center;
+            padding: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a {
+            color: #fff;
+            margin: 0 0.5rem;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+            .footer-links a:hover {
+                opacity: 1;
+            }
+        /* Dark Mode Overrides */
+        .dark-mode {
+            background: linear-gradient(135deg, #141414 30%, #222 100%) !important;
+            color: #ddd;
+        }
+
+            .dark-mode .welcome-banner {
+                background: linear-gradient(135deg, #1e1e1e, #333);
+            }
+
+            .dark-mode .stat-card,
+            .dark-mode .action-card,
+            .dark-mode .report-card,
+            .dark-mode .tip-card {
+                background: #2a2a2a;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+
+                .dark-mode .stat-card h3,
+                .dark-mode .action-card h3,
+                .dark-mode .report-card h3 {
+                    color: #ddd;
+                }
+
+
+                .dark-mode .stat-card p,
+                .dark-mode .action-card p,
+                .dark-mode .report-summary p,
+                .dark-mode .tip-card p {
+                    color: #ccc;
+                }
+
+            .dark-mode .brand-text {
+                color: #9bd1ff;
+            }
+
+            .dark-mode .nav-btn {
+                color: #ddd;
+            }
+
+            .dark-mode .footer-links a {
+                color: #ddd;
+            }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="main-header">
+        <nav class="header-nav">
+            <a href="/Home/Index" class="text-decoration-none">
+                <div class="d-flex align-items-center">
+                    <img src="~/logos.png" alt="BioCheck AI Logo" class="brand-logo" />
+                    <span class="brand-text ml-2" style="color:#FFFFFF">BioCheck AI</span>
+                </div>
+            </a>
+            <div class="nav-controls d-flex align-items-center">
+                <!-- Dark Mode Toggle -->
+                <button class="btn btn-light" aria-label="Toggle Dark Mode" id="toggleDarkMode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a class="btn btn-light ml-2" href="Landing" aria-label="Home">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a class="btn btn-light ml-2" href="About" aria-label="About">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-container">
+        <!-- Welcome Section -->
+        <section class="dashboard-section">
+            <div class="welcome-banner">
+                <h1>Welcome Back, Lukas!</h1>
+                <p>Your current health score: <span class="health-score">84/100</span></p>
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-heartbeat"></i>
+                        <h3>Last Report</h3>
+                        <p>15 June 2024</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-weight"></i>
+                        <h3>Weight Trend</h3>
+                        <p>-2.3kg last month</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-running"></i>
+                        <h3>Activity Level</h3>
+                        <p>85% of goal</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="dashboard-section">
+            <h2>Quick Actions</h2>
+            <div class="action-grid">
+                <a href="Index" class="action-card">
+                    <i class="fas fa-file-upload"></i>
+                    <h3>Upload New Reports</h3>
+                    <p>Submit recent medical documents for analysis</p>
+                </a>
+                <a href="#history" class="action-card">
+                    <i class="fas fa-history"></i>
+                    <h3>View History</h3>
+                    <p>Access previous reports and comparisons</p>
+                </a>
+                <a href="#trends" class="action-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Health Trends</h3>
+                    <p>View long-term health metrics analysis</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Recent Reports -->
+        <section class="dashboard-section">
+            <h2>Recent Reports</h2>
+            <div class="report-list">
+                <div class="report-card">
+                    <div class="report-header">
+                        <h3>Blood Analysis</h3>
+                        <span class="report-date">12 June 2024</span>
+                    </div>
+                    <div class="report-summary">
+                        <p>Key findings: Improved cholesterol levels, maintain vitamin D intake</p>
+                        <div class="report-status positive">
+                            <i class="fas fa-check-circle"></i>
+                            12% improvement
+                        </div>
+                    </div>
+                </div>
+                <div class="report-card">
+                    <div class="report-header">
+                        <h3>Fitness Assessment</h3>
+                        <span class="report-date">5 June 2024</span>
+                    </div>
+                    <div class="report-summary">
+                        <p>Cardio efficiency increased, recommend strength training</p>
+                        <div class="report-status neutral">
+                            <i class="fas fa-info-circle"></i>
+                            Stable performance
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Health Tips Carousel -->
+        <section class="dashboard-section">
+            <h2>Personalized Health Tips</h2>
+            <div class="tips-carousel">
+                <div class="tip-card">
+                    <i class="fas fa-apple-alt"></i>
+                    <h3>Nutrition Tip</h3>
+                    <p>Increase fiber intake with more whole grains and vegetables.</p>
+                </div>
+                <div class="tip-card">
+                    <i class="fas fa-moon"></i>
+                    <h3>Sleep Advice</h3>
+                    <p>Aim for 7-8 hours of sleep with a consistent bedtime.</p>
+                </div>
+                <div class="tip-card">
+                    <i class="fas fa-hand-holding-water"></i>
+                    <h3>Hydration</h3>
+                    <p>You're meeting 85% of your daily hydration goals.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 BioCheck AI. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="contact.html">Contact Support</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

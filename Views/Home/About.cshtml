@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About - BioCheck AI</title>
+
+
+    <script src="~/js/mainFunctions.js"></script>
+
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <!-- Google Fonts: Montserrat & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/custom.css">
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --brand-teal: #17a085;
+            --brand-teal-dark: #117964;
+            --brand-green: #27ae60;
+            --accent-pink: #d63384;
+            --gray-light: #eef1f4;
+            --gray-dark: #1a1a1a;
+            --brand-blue: #3498db;
+            --brand-purple: #8e44ad;
+            --light-green: #2ecc71;
+            --light-blue: #3498db;
+        }
+
+        body {
+            font-family: 'Montserrat', 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ffffff 30%, #f7f9fa 100%);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.4s, color 0.4s;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        * {
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode {
+            background: linear-gradient(135deg, #141414 30%, #222 100%) !important;
+            color: #ddd !important;
+        }
+
+            .dark-mode a,
+            .dark-mode h1,
+            .dark-mode h2,
+            .dark-mode h3,
+            .dark-mode h4,
+            .dark-mode h5 {
+                color: #fff !important;
+            }
+   
+
+        .navbar-brand {
+            font-size: 1.6rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+            .navbar-brand img {
+                width: 55px;
+                margin-right: 10px;
+            }
+
+        .nav-controls .btn {
+            margin-left: 10px;
+        }
+        /* Hero Section */
+        .hero-section {
+            padding: 2rem 0;
+            background: linear-gradient(135deg, var(--light-green), var(--light-green));
+            color: #fff;
+            text-align: center;
+        }
+
+            .hero-section h1 {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+
+            .hero-section p {
+                font-size: 1.2rem;
+                margin-bottom: 2rem;
+            }
+
+
+        /* About Content */
+        .about-content {
+            padding: 4rem 0;
+        }
+
+            .about-content .content-section {
+                margin-bottom: 3rem;
+            }
+
+            .about-content img {
+                max-width: 100%;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            }
+        /* Mission & Vision */
+        .mission-section {
+            background: var(--gray-light);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+            .mission-section h2 {
+                margin-bottom: 1rem;
+            }
+
+            .mission-section p {
+                font-size: 1.1rem;
+                margin-bottom: 0;
+            }
+        /* Team Section */
+        .team-section {
+            padding: 4rem 0;
+            background: #fff;
+        }
+
+            .team-section h2 {
+                text-align: center;
+                margin-bottom: 3rem;
+            }
+
+        .team-member {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+            .team-member img {
+                width: 150px;
+                height: 150px;
+                object-fit: cover;
+                border-radius: 50%;
+                margin-bottom: 1rem;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            }
+
+            .team-member h5 {
+                margin-bottom: 0.5rem;
+            }
+
+            .team-member p {
+                margin-bottom: 0;
+                font-size: 0.9rem;
+                color: #777;
+            }
+        /* Footer */
+        .main-footer {
+            background: var(--gray-dark);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+            .main-footer a {
+                color: white;
+                opacity: 0.8;
+                margin: 0 0.5rem;
+            }
+
+                .main-footer a:hover {
+                    opacity: 1;
+                    text-decoration: none;
+                }
+
+        .dark-mode .mission-section {
+            background: #2a2a2a;
+        }
+
+        .dark-mode .team-section {
+            background: #2a2a2a;
+            color: #ddd;
+        }
+
+        .dark-mode .main-footer {
+            background: #1a1a1a;
+        }
+
+        .dark-mode .hero-section {
+            background: linear-gradient(135deg, var(--brand-blue), var(--brand-purple));
+        }
+
+        
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="header-nav">
+            <a href="/Home/Index" class="text-decoration-none">
+                <div class="d-flex align-items-center">
+                    <img src="~/logos.png" alt="BioCheck AI Logo" class="brand-logo" />
+                    <span class="brand-text ml-2" style="color:#FFFFFF">BioCheck AI</span>
+                </div>
+            </a>
+            <div class="nav-controls d-flex align-items-center">
+                <!-- Dark Mode Toggle -->
+                <button class="btn btn-light" aria-label="Toggle Dark Mode" id="toggleDarkMode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a class="btn btn-light ml-2" asp-controller="Home" asp-action="Landing" aria-label="Home">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a class="btn btn-light ml-2" asp-controller="Home" asp-action="About" aria-label="About">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </a>
+                <a class="btn btn-light ml-2" asp-controller="Home" asp-action="Logging" aria-label="Login">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Login</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1>About BioCheck AI</h1>
+            <p>Empowering you with personalized health insights through cutting-edge technology.</p>
+        </div>
+    </section>
+
+    <!-- About Content -->
+    <section class="about-content">
+        <div class="container">
+            <!-- Our Story -->
+            <div class="row content-section align-items-center">
+                <div class="col-md-6">
+                    <h2>Our Story</h2>
+                    <p>Founded with a passion for health and innovation, BioCheck AI emerged from the need for accessible, data-driven insights in personal healthcare. Our journey began with a small team of experts dedicated to bridging the gap between complex medical data and everyday wellness. Today, we continue to evolve by integrating advanced AI and machine learning, ensuring that our users receive the most accurate and actionable health analysis available.</p>
+                </div>
+                <div class="col-md-6">
+                    <img src="~/story.png" alt="Our Story" />
+                </div>
+            </div>
+
+            <!-- Our Mission & Vision -->
+            <div class="row content-section">
+                <div class="col">
+                    <div class="mission-section">
+                        <h2>Our Mission &amp; Vision</h2>
+                        <p><strong>Mission:</strong> To empower individuals with comprehensive and personalized health insights, making advanced medical analysis accessible to everyone.</p>
+                        <br />
+                        <p><strong>Vision:</strong> To become the global leader in AI-driven health analysis, fostering a healthier world through innovation, transparency, and trusted technology.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section">
+        <div class="container">
+            <h2>Meet Our Team</h2>
+            <div class="row">
+                <!-- Team Member 1 -->
+                <div class="col-md-4 team-member">
+                    <h5>Mohammad Mehdi</h5>
+                </div>
+                <!-- Team Member 2 -->
+                <div class="col-md-4 team-member">
+                    <h5>Lukas Fukuoka</h5>
+                </div>
+                <!-- Team Member 3 -->
+                <div class="col-md-4 team-member">
+                    <h5>Rodrigo Pichara</h5>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; 2025 BioCheck AI. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery & Bootstrap Bundle -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
