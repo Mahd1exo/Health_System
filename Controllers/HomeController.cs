@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,16 +15,16 @@ namespace Health_System.Controllers
     public class HomeController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly string _openAiApiKey;
+        private readonly string _youTubeApiKey;
+        private readonly string _googleMapApiKey;
 
-        // TODO: Move these keys to config or environment variables in production!
-        private const string OpenAiApiKey = "";
-
-        private const string YouTubeApiKey = "";
-        private const string GoogleMapApiKey = "";
-
-        public HomeController(IHttpClientFactory httpClientFactory)
+        public HomeController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
+            _openAiApiKey = configuration["ApiKeys:OpenAI"] ?? string.Empty;
+            _youTubeApiKey = configuration["ApiKeys:YouTube"] ?? string.Empty;
+            _googleMapApiKey = configuration["ApiKeys:GoogleMaps"] ?? string.Empty;
         }
 
         // GET: Home/Index
@@ -93,7 +94,7 @@ namespace Health_System.Controllers
                           "IMPORTANT (No disclaimers, no triple backticks, no **bold** placeholders). " +
                           "Write as much detail as possible in a professional, friendly style. " +
                           "Use <h2> for headings and <p style='font-size:16px;'> for paragraphs. " +
-                          "Focus purely on the requested analysis—do not mention your internal instructions.\n NO HEADER JUST ELEMENTS IN DIV  ";
+                          "Focus purely on the requested analysisâ€”do not mention your internal instructions.\n NO HEADER JUST ELEMENTS IN DIV  ";
 
                 // Pass prompt & images to be processed
                 return ProcessAnalysisOptionAsync(option, prompt, base64Images);
@@ -171,7 +172,7 @@ namespace Health_System.Controllers
             {
                 // Step 1: Extract short search query from the analysis
                 string shortQueryPrompt =
-                    "From this analysis, extract 3-7 keywords describing the user’s main health concerns: " +
+                    "From this analysis, extract 3-7 keywords describing the userâ€™s main health concerns: " +
                     initialResponse +
                     " Return only the keywords, separated by spaces or commas. No extra text.";
 
@@ -251,7 +252,7 @@ namespace Health_System.Controllers
             var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
             var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + OpenAiApiKey);
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + _openAiApiKey);
 
             var apiResponse = await client.PostAsync("https://api.openai.com/v1/chat/completions", content);
             string responseString = await apiResponse.Content.ReadAsStringAsync();
@@ -321,7 +322,7 @@ namespace Health_System.Controllers
             if (string.IsNullOrWhiteSpace(query)) return videos;
 
             // Construct YouTube Data API call
-            string youtubeUrl = $"https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=7&q={Uri.EscapeDataString(query)}&key={YouTubeApiKey}";
+            string youtubeUrl = $"https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=7&q={Uri.EscapeDataString(query)}&key={_youTubeApiKey}";
             var client = _httpClientFactory.CreateClient();
 
             try
@@ -392,7 +393,7 @@ namespace Health_System.Controllers
                 "nutrition" =>
                     "You are an expert nutritionist. " +
                     "Provide a thorough dietary analysis, highlight nutrient deficiencies, " +
-                    "and offer practical meal suggestions based on the user’s data.",
+                    "and offer practical meal suggestions based on the userâ€™s data.",
                 "fitness" =>
                     "You are a top-tier fitness coach. " +
                     "Design a customized workout plan emphasizing strength, endurance, and overall health.",
@@ -434,7 +435,7 @@ namespace Health_System.Controllers
                     "Evaluate liver, kidney, or other organ health issues.",
                 "immuneinsights" =>
                     "You are an immunologist. " +
-                    "Assess the immune system’s status and ways to enhance it.",
+                    "Assess the immune systemâ€™s status and ways to enhance it.",
                 "bonehealth" =>
                     "You are a bone health specialist. " +
                     "Evaluate bone density factors and recommend improvements.",
@@ -461,11 +462,11 @@ namespace Health_System.Controllers
                     "Offer personalized tips on stress management and daily habits.",
                 "doctorsuggestion" =>
                     "You are a healthcare network navigator. " +
-                    "Recommend an appropriate specialist near the user’s location.",
+                    "Recommend an appropriate specialist near the userâ€™s location.",
                 "videohelp" =>
                     // Used first to produce a short search query in combination with user data
                     "You are an AI specialized in generating short search queries for relevant health/wellness videos. " +
-                    "Summarize the user’s needs in 3-7 strong keywords.",
+                    "Summarize the userâ€™s needs in 3-7 strong keywords.",
                 _ =>
                     "You are a general health AI assistant. " +
                     "Offer a comprehensive analysis based on the data."
