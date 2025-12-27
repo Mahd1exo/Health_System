@@ -1,4 +1,6 @@
+using Ganss.Xss;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,23 +9,22 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 
 namespace Health_System.Controllers
 {
     public class HomeController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
 
-        // TODO: Move these keys to config or environment variables in production!
-        private const string OpenAiApiKey = "";
+        private const long MaxFileSizeBytes = 5 * 1024 * 1024;
+        private static readonly string[] AllowedContentTypes = { "image/jpeg", "image/png", "image/webp" };
+        private static readonly HtmlSanitizer HtmlSanitizer = CreateHtmlSanitizer();
 
-        private const string YouTubeApiKey = "";
-        private const string GoogleMapApiKey = "";
-
-        public HomeController(IHttpClientFactory httpClientFactory)
+        public HomeController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
         }
 
         // GET: Home/Index
@@ -68,6 +69,18 @@ namespace Health_System.Controllers
                 return View("Index");
             }
 
+            if (!TryValidateUploads(Request.Form.Files, out var fileValidationError))
+            {
+                ViewBag.Error = fileValidationError;
+                return View("Index");
+            }
+
+            if (string.IsNullOrWhiteSpace(GetOpenAiApiKey()))
+            {
+                ViewBag.Error = "OpenAI API key is missing. Please configure OpenAi:ApiKey.";
+                return View("Index");
+            }
+
             // 2. Collect Form Inputs
             var userInputs = ExtractUserInputs(Request.Form);
 
@@ -93,7 +106,7 @@ namespace Health_System.Controllers
                           "IMPORTANT (No disclaimers, no triple backticks, no **bold** placeholders). " +
                           "Write as much detail as possible in a professional, friendly style. " +
                           "Use <h2> for headings and <p style='font-size:16px;'> for paragraphs. " +
-                          "Focus purely on the requested analysis—do not mention your internal instructions.\n NO HEADER JUST ELEMENTS IN DIV  ";
+                          "Focus purely on the requested analysis - do not mention your internal instructions.\n NO HEADER JUST ELEMENTS IN DIV  ";
 
                 // Pass prompt & images to be processed
                 return ProcessAnalysisOptionAsync(option, prompt, base64Images);
@@ -171,7 +184,7 @@ namespace Health_System.Controllers
             {
                 // Step 1: Extract short search query from the analysis
                 string shortQueryPrompt =
-                    "From this analysis, extract 3-7 keywords describing the user’s main health concerns: " +
+                    "From this analysis, extract 3-7 keywords describing the user's main health concerns: " +
                     initialResponse +
                     " Return only the keywords, separated by spaces or commas. No extra text.";
 
@@ -214,7 +227,7 @@ namespace Health_System.Controllers
         /// </summary>
         private async Task<string> CallOpenAiApiAsync(string prompt, List<string> base64Images)
         {
-            // Build a list of "content" objects for OpenAI. 
+            // Build a list of "content" objects for OpenAI.
             // The first item is the text prompt, followed by each image as a data URI if desired.
             var contentList = new List<object>
             {
@@ -224,7 +237,7 @@ namespace Health_System.Controllers
             // Optionally pass images; but here we just store them if needed:
             foreach (var base64 in base64Images)
             {
-                // Note: This depends on your model's capability to accept images. 
+                // Note: This depends on your model's capability to accept images.
                 // Many mainstream GPT endpoints do not currently handle image data directly.
                 contentList.Add(new
                 {
@@ -251,7 +264,7 @@ namespace Health_System.Controllers
             var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
             var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + OpenAiApiKey);
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + GetOpenAiApiKey());
 
             var apiResponse = await client.PostAsync("https://api.openai.com/v1/chat/completions", content);
             string responseString = await apiResponse.Content.ReadAsStringAsync();
@@ -261,6 +274,7 @@ namespace Health_System.Controllers
 
             // Clean up any triple backticks, bold markers, etc.
             resultText = CleanOpenAiResponse(resultText);
+            resultText = HtmlSanitizer.Sanitize(resultText);
 
             return resultText;
         }
@@ -291,7 +305,7 @@ namespace Health_System.Controllers
         }
 
         /// <summary>
-        /// Performs post-processing on the AI response to remove triple backticks, 
+        /// Performs post-processing on the AI response to remove triple backticks,
         /// bold placeholders, or any undesired markdown artifacts.
         /// </summary>
         private string CleanOpenAiResponse(string text)
@@ -300,7 +314,6 @@ namespace Health_System.Controllers
 
             text = text.Replace("```html", "", StringComparison.OrdinalIgnoreCase);
             text = text.Replace("```", "", StringComparison.OrdinalIgnoreCase);
-
 
             // Remove any "**" for bold placeholders
             text = text.Replace("**", "");
@@ -319,9 +332,10 @@ namespace Health_System.Controllers
         {
             var videos = new List<string>();
             if (string.IsNullOrWhiteSpace(query)) return videos;
+            if (string.IsNullOrWhiteSpace(GetYouTubeApiKey())) return videos;
 
             // Construct YouTube Data API call
-            string youtubeUrl = $"https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=7&q={Uri.EscapeDataString(query)}&key={YouTubeApiKey}";
+            string youtubeUrl = $"https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=7&q={Uri.EscapeDataString(query)}&key={GetYouTubeApiKey()}";
             var client = _httpClientFactory.CreateClient();
 
             try
@@ -392,7 +406,7 @@ namespace Health_System.Controllers
                 "nutrition" =>
                     "You are an expert nutritionist. " +
                     "Provide a thorough dietary analysis, highlight nutrient deficiencies, " +
-                    "and offer practical meal suggestions based on the user’s data.",
+                    "and offer practical meal suggestions based on the user's data.",
                 "fitness" =>
                     "You are a top-tier fitness coach. " +
                     "Design a customized workout plan emphasizing strength, endurance, and overall health.",
@@ -434,7 +448,7 @@ namespace Health_System.Controllers
                     "Evaluate liver, kidney, or other organ health issues.",
                 "immuneinsights" =>
                     "You are an immunologist. " +
-                    "Assess the immune system’s status and ways to enhance it.",
+                    "Assess the immune system's status and ways to enhance it.",
                 "bonehealth" =>
                     "You are a bone health specialist. " +
                     "Evaluate bone density factors and recommend improvements.",
@@ -461,11 +475,11 @@ namespace Health_System.Controllers
                     "Offer personalized tips on stress management and daily habits.",
                 "doctorsuggestion" =>
                     "You are a healthcare network navigator. " +
-                    "Recommend an appropriate specialist near the user’s location.",
+                    "Recommend an appropriate specialist near the user's location.",
                 "videohelp" =>
                     // Used first to produce a short search query in combination with user data
                     "You are an AI specialized in generating short search queries for relevant health/wellness videos. " +
-                    "Summarize the user’s needs in 3-7 strong keywords.",
+                    "Summarize the user's needs in 3-7 strong keywords.",
                 _ =>
                     "You are a general health AI assistant. " +
                     "Offer a comprehensive analysis based on the data."
@@ -473,6 +487,60 @@ namespace Health_System.Controllers
 
             // Combine
             return $"{analysisPrompt}\nIMPORTANT:\n{userSummary}\nRefer to the lab report images to tailor your advice.";
+        }
+
+        private string GetOpenAiApiKey()
+        {
+            return _configuration["OpenAi:ApiKey"] ?? string.Empty;
+        }
+
+        private string GetYouTubeApiKey()
+        {
+            return _configuration["YouTube:ApiKey"] ?? string.Empty;
+        }
+
+        private bool TryValidateUploads(Microsoft.AspNetCore.Http.IFormFileCollection files, out string errorMessage)
+        {
+            foreach (var file in files)
+            {
+                if (file.Length == 0)
+                {
+                    errorMessage = "One or more uploaded files were empty.";
+                    return false;
+                }
+
+                if (file.Length > MaxFileSizeBytes)
+                {
+                    errorMessage = "Each image must be 5 MB or smaller.";
+                    return false;
+                }
+
+                if (!AllowedContentTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
+                {
+                    errorMessage = "Only JPEG, PNG, or WebP images are supported.";
+                    return false;
+                }
+            }
+
+            errorMessage = string.Empty;
+            return true;
+        }
+
+        private static HtmlSanitizer CreateHtmlSanitizer()
+        {
+            var sanitizer = new HtmlSanitizer();
+            sanitizer.AllowedAttributes.Add("style");
+            sanitizer.AllowedAttributes.Add("class");
+            sanitizer.AllowedTags.Add("iframe");
+            sanitizer.AllowedAttributes.Add("src");
+            sanitizer.AllowedAttributes.Add("width");
+            sanitizer.AllowedAttributes.Add("height");
+            sanitizer.AllowedAttributes.Add("frameborder");
+            sanitizer.AllowedAttributes.Add("allow");
+            sanitizer.AllowedAttributes.Add("allowfullscreen");
+            sanitizer.AllowedAttributes.Add("title");
+            sanitizer.AllowedSchemes.Add("https");
+            return sanitizer;
         }
     }
 }
